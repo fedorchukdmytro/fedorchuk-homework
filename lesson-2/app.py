@@ -9,7 +9,7 @@ fake = Faker()
 
 @app.route('/requirements/')
 def f():
-    file = open("fedorchuk-homework/lesson-2/requirements.txt", "r")
+    file = open("lesson-2/requirements.txt","r")
     data = file.read()
     return(data)
 
@@ -24,7 +24,7 @@ def create_names_list(num):
 def mean():
     height_list = []
     weight_list = []
-    with open('fedorchuk-homework/lesson-2/hw.csv') as csvfile:
+    with open('lesson-2/hw.csv') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=',')
         for row in reader:
             height = row[' "Height(Inches)"']
