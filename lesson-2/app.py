@@ -39,8 +39,8 @@ def indexPage():
                 tbl_reader = csv.reader(csvfile, delimiter=';')
                 next(tbl_reader)
                 for row in tbl_reader:
-                    ins = Sales(Transaction_date=row[0], Product=row[1], Price=row[2], Payment_type=row[3])
-                    db.session.add(ins)
+                    insertion = Sales(Transaction_date=row[0], Product=row[1], Price=row[2], Payment_type=row[3])
+                    db.session.add(insertion)
                 db.session.commit()
         return "<h1>DATABASE WAS JUST CREATED<h1/>"
 
