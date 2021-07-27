@@ -1,15 +1,52 @@
+import re
 from faker import Faker
 from flask import Flask
 import requests
 import json
 import csv
+from flask_sqlalchemy import SQLAlchemy
+from flask import request
 
 app = Flask(__name__)
 fake = Faker()
 
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///homework3.db'
+db = SQLAlchemy(app)
+
+
+class Sales(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    
+    Transaction_date = db.Column(db.String, unique=False, nullable=False)
+    Product = db.Column(db.String(80), unique=False, nullable=False)
+    Price = db.Column(db.Integer, unique=False, nullable=False)
+    Payment_type = db.Column(db.String(80), unique=False, nullable=False)
+
+    def __repr__(self):
+        return f'[{self.Transaction_date}, {self.Product}, {self.Price}]'                         
+
+db.create_all()      
+
+
+@app.route('//')
+def indexPage():
+    if len(Sales.query.all()) !=0:
+        return "<h1>DATABASE ALREADY EXISTS<h1/>"
+    else:
+        with open ('homework3sales.csv', 'r') as csvfile:
+                tbl_reader = csv.reader(csvfile, delimiter=';')
+                next(tbl_reader)
+                for row in tbl_reader:
+                    ins = Sales(Transaction_date=row[0], Product=row[1], Price=row[2], Payment_type=row[3])
+                    db.session.add(ins)
+                db.session.commit()
+        return "<h1>DATABASE WAS JUST CREATED<h1/>"
+
 @app.route('/requirements/')
 def f():
-    file = open("lesson-2/requirements.txt","r")
+    file = open("requirements.txt","r")
     data = file.read()
     return(data)
 
@@ -24,11 +61,9 @@ def create_names_list(num):
 def mean():
     height_list = []
     weight_list = []
-    with open('lesson-2/hw.csv') as csvfile:
+    with open('hw.csv') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=',')
         for row in reader:
-            height = row[' "Height(Inches)"']
-            weight = row[' "Weight(Pounds)"']
             height_list.append(float(row[' "Height(Inches)"']))
             weight_list.append(float(row[' "Weight(Pounds)"']))
             averageHeight = sum(height_list) / len(height_list)
@@ -43,7 +78,31 @@ def space():
     return(r.json())
 
 
+@app.route("/summary/")
+def summary():
+    sales = Sales.query.all()
+    summary_dict = {}
+    for event in sales:
+        date = event.Transaction_date.split()[0]
+        if not date in summary_dict.keys():
+            summary_dict[date] = float(event.Price)
+        else:
+            transitional_sum = summary_dict.get(date, 0.0)
+            summary_dict[date] = transitional_sum + float(event.Price)
+    return summary_dict      
+
+@app.route('/sales/')
+def query():
+    
+    args = request.args
+    argsdict ={}
+    for key, value in args.items():
+        argsdict[key.capitalize()] = value.capitalize()
+    query = Sales.query.filter_by(**argsdict).all()
+    return str(query)
+
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run()
+    
