@@ -1,8 +1,6 @@
-import re
 from faker import Faker
 from flask import Flask
 import requests
-import json
 import csv
 from flask_sqlalchemy import SQLAlchemy
 from flask import request
@@ -48,7 +46,7 @@ def indexPage():
 def f():
     file = open("requirements.txt","r")
     data = file.read()
-    output = [f"  {line} ;<br/>" for line in data.split()]
+    output = [f" {line} ;<br/>" for line in data.split()]
     return str(output)
 
 @app.route('/generate-users/<int:num>')
