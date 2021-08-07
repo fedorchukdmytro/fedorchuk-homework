@@ -46,12 +46,12 @@ def indexPage():
 def f():
     file = open("requirements.txt","r")
     data = file.read()
-    output = [f" {line} ;<br/>" for line in data.split()]
+    output = ''.join([f" {line} ;<br/>" for line in data.split()])
     return str(output)
 
 @app.route('/generate-users/<int:num>')
 def create_names_list(num): 
-    output = [f" {fake.first_name()}{fake.email()};<br/>" for i in range(0,num)]
+    output = ''.join([f" {fake.first_name()} {fake.email()};<br/>" for i in range(0,num)])
     return str(output)
 
 @app.route('/mean/')
@@ -86,7 +86,8 @@ def summary():
         else:
             transitional_sum = summary_dict.get(date, 0.0)
             summary_dict[date] = transitional_sum + float(event.Price)
-    output = [ f"{key} : {value} <br/>" for key, value in summary_dict.items()]
+    
+    output = ''.join([ f"{key} : {value}; <br/>" for key, value in summary_dict.items()])
     return str(output)    
 
 @app.route('/sales/')
@@ -97,7 +98,7 @@ def query():
     for key, value in args.items():
         argsdict[key.capitalize()] = value.capitalize()
     query = Sales.query.filter_by(**argsdict).all()
-    output = [ f" {x.Product},{x.Payment_type},{x.Price},{x.Transaction_date.split()[0]}<br/>" for x in query] 
+    output = ''.join([ f" {x.Product},{x.Payment_type},{x.Price},{x.Transaction_date.split()[0]}<br/>" for x in query])
     return str(output)
 
 
